@@ -19,6 +19,11 @@ PROJECT_ROOT = os.path.dirname(
 
 sys.path.append(PROJECT_ROOT)
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 
 # ==========================================
 # IMPORTS
@@ -533,12 +538,18 @@ Do not use bullet points.
             return response.text.strip()
 
 
-        except Exception:
-
-            print(
-                f"{model} unavailable. "
-                f"Trying next model..."
-            )
+        except Exception as err:
+            err_msg = str(err)
+            if "RESOURCE_EXHAUSTED" in err_msg or "402" in err_msg:
+                print(
+                    f"⚠️ Quota/Prepayment exhausted on {model}: "
+                    f"Please visit https://ai.studio/projects to check credits."
+                )
+            else:
+                print(
+                    f"{model} unavailable ({err}). "
+                    f"Trying next model..."
+                )
 
 
     return (
