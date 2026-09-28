@@ -1,0 +1,105 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2835";
+
+    /*
+     * Enable Raspberry Pi I2S controller
+     */
+    fragment@0 {
+        target = <&i2s_clk_producer>;
+
+        __overlay__ {
+            status = "okay";
+        };
+    };
+
+    /*
+     * MAX98357A playback codec
+     */
+    fragment@1 {
+        target-path = "/";
+
+        __overlay__ {
+            max98357a_dac: max98357a {
+                compatible = "maxim,max98357a";
+                #sound-dai-cells = <0>;
+                status = "okay";
+            };
+        };
+    };
+
+    /*
+     * INMP441 capture codec
+     *
+     * The generic dmic-codec driver is used because
+     * the INMP441 is a digital I2S microphone.
+     */
+    fragment@2 {
+        target-path = "/";
+
+        __overlay__ {
+            inmp441_codec: inmp441-codec {
+                compatible = "dmic-codec";
+                #sound-dai-cells = <0>;
+                num-channels = <1>;
+                status = "okay";
+            };
+        };
+    };
+
+    /*
+     * Combined Project T sound card
+     *
+     * DAI link 0 = playback
+     * DAI link 1 = capture
+     */
+    fragment@3 {
+        target = <&sound>;
+
+        __overlay__ {
+            compatible = "simple-audio-card";
+
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            simple-audio-card,name = "ProjectT-Audio";
+            status = "okay";
+
+            /*
+             * PLAYBACK
+             * Pi I2S -> MAX98357A
+             */
+            simple-audio-card,dai-link@0 {
+                reg = <0>;
+                format = "i2s";
+
+                playback_cpu: cpu {
+                    sound-dai = <&i2s_clk_producer>;
+                };
+
+                playback_codec: codec {
+                    sound-dai = <&max98357a_dac>;
+                };
+            };
+
+            /*
+             * CAPTURE
+             * INMP441 -> Pi I2S
+             */
+            simple-audio-card,dai-link@1 {
+                reg = <1>;
+                format = "i2s";
+
+                capture_cpu: cpu {
+                    sound-dai = <&i2s_clk_producer>;
+                };
+
+                capture_codec: codec {
+                    sound-dai = <&inmp441_codec>;
+                };
+            };
+        };
+    };
+};

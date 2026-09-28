@@ -1,0 +1,18 @@
+Project T Audio Plan
+
+Playback:
+Raspberry Pi I2S -> MAX98357A -> Speaker
+
+Capture:
+INMP441 -> Raspberry Pi I2S
+
+I2S pins:
+GPIO18 = BCLK
+GPIO19 = LRCLK / WS
+GPIO20 = INMP441 DATA
+GPIO21 = MAX98357A DATA
+
+Current status:
+MAX98357A playback = WORKING
+INMP441 capture = NOT REGISTERED
+snd_soc_dmic driver = AVAILABLE

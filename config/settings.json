@@ -1,0 +1,8 @@
+{
+    "assistant_name": "Zeno",
+    "wake_phrase": "Hey Zeno",
+    "wake_word_enabled": true,
+    "language": "en",
+    "voice": "en-IN-NeerjaNeural",
+    "record_seconds": 5
+}
